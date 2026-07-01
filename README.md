@@ -8,6 +8,11 @@ WatchFlow Automator is a production-style portfolio demo for browser automation 
 
 > Honest status: this public V1 is a deployable demo shell with seeded data and mocked run execution. It demonstrates architecture, UI quality, automation workflow thinking, and implementation direction without pretending to scrape real third-party systems in production.
 
+## Public demo
+
+- Vercel URL: https://fredy-watchflow-automator.vercel.app
+- GitHub URL: https://github.com/JuanCG13/fredy-watchflow-automator
+
 ## Stitch design
 
 - Stitch project: `projects/10892099372177702220`
