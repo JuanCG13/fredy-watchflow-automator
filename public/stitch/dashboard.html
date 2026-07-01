@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WatchFlow Automator | Ops Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#0f1e3f",
+                        "outline": "#6475a1",
+                        "on-tertiary-container": "#000000",
+                        "error": "#f97758",
+                        "primary-dim": "#38d36a",
+                        "secondary-fixed": "#c4e7ff",
+                        "primary-fixed-dim": "#5bf083",
+                        "secondary": "#7bd0ff",
+                        "on-primary-fixed": "#004a1d",
+                        "inverse-primary": "#006e2f",
+                        "surface-dim": "#060e20",
+                        "on-primary": "#004b1e",
+                        "surface-tint": "#4ae176",
+                        "tertiary": "#ac8aff",
+                        "tertiary-dim": "#8455ef",
+                        "on-tertiary": "#280067",
+                        "on-background": "#dee5ff",
+                        "surface-bright": "#182b52",
+                        "on-secondary": "#004560",
+                        "surface": "#060e20",
+                        "error-dim": "#c44f34",
+                        "on-tertiary-fixed-variant": "#fdf6ff",
+                        "primary": "#4ae176",
+                        "secondary-dim": "#2db7f2",
+                        "on-surface": "#dee5ff",
+                        "surface-container": "#0a1836",
+                        "on-error-container": "#ff9b82",
+                        "inverse-on-surface": "#4d556b",
+                        "surface-variant": "#11244c",
+                        "on-tertiary-fixed": "#ffffff",
+                        "on-secondary-container": "#63caff",
+                        "secondary-container": "#004059",
+                        "on-secondary-fixed": "#00445e",
+                        "secondary-fixed-dim": "#a2dcff",
+                        "primary-fixed": "#6bff8f",
+                        "primary-container": "#0abc56",
+                        "surface-container-highest": "#11244c",
+                        "on-secondary-fixed": "#00445e",
+                        "secondary-fixed-dim": "#a2dcff",
+                        "primary-fixed": "#6bff8f",
+                        "primary-container": "#0abc56",
+                        "surface-container-highest": "#11244c",
+                        "on-secondary-fixed-variant": "#006286",
+                        "background": "#060e20",
+                        "on-surface-variant": "#99aad9",
+                        "on-primary-fixed-variant": "#006a2d",
+                        "outline-variant": "#364770",
+                        "on-error": "#450900",
+                        "error-container": "#85230a",
+                        "tertiary-fixed": "#8f60fa",
+                        "on-primary-container": "#002c0f",
+                        "tertiary-container": "#8f60fa",
+                        "surface-container-lowest": "#000000",
+                        "tertiary-fixed-dim": "#8252ec",
+                        "surface-container-low": "#06122c",
+                        "inverse-surface": "#faf8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #060e20;
+            color: #dee5ff;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #364770;
+            border-radius: 10px;
+        }
+        .bento-card {
+            background: rgba(10, 24, 54, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid #364770;
+            transition: all 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: #6475a1;
+            background: rgba(17, 36, 76, 0.8);
+        }
+        .terminal-bg {
+            background: #000000;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .diff-added { color: #4ae176; background: rgba(74, 225, 118, 0.1); }
+        .diff-removed { color: #f97758; background: rgba(249, 119, 88, 0.1); }
+        .diff-changed { color: #ffca28; background: rgba(255, 202, 40, 0.1); }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="flex flex-col fixed left-0 top-0 h-full z-50 border-r border-outline-variant bg-surface-dim dark:bg-surface-dim shadow-xl w-64">
+<div class="p-6 flex items-center gap-3">
+<img alt="WatchFlow Logo" class="w-10 h-10" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAGnElEQVR4AexaXWgcVRQ+Z7apaUyaKooQa0li/asPggQ0P1B8kD5axDxYsyFGra9ag+KT+JzYqG8t2KbZQB/qvyCUPjZNoxSLUDSCJsHWoFCsJZouzWaP52x2NjNz78zcmdlkt80Oe/aee+fce89855t7z+yOBZv8qAGwyQkANQbUGLDJEajYLdB2rv+Ftsn0TEFYr1QcKgYAEr2PiI8UhPVNBwAg7ildtFMvNW6MUjEGbMzlhc9SAyAco9vbosaAoPi2T6afbzuXfu2+H9N3BtlV47l7JgebWqf6DrLsD/JPy4D2s+ldbZP9f/BK/RkCHm1YxB/unn5pe9BA1XRu19kDd23H3EWLrCMsX7RP9v++c6r/fp2PWgAgBa8gQovdgfWHd+Ssd+16tZdbrC3vsI8Psqx+EB6oIxqQile0AOQJl7yGBNjvbUtUJ/qp1N+plxpjKuwoEaS9vZFAuSax0QIAaH0lJ52CzIi2yb5nnW1JdEJ8jwBmCOhn0ZOM5ezber5vn/jqbBN9Ga2vpfSKFoD5rrEZIvrOa4yIg962uPW57vFPWR6b687smWM97jjefkiWQnVmxPTl7hO/eW2lbsmXTjg6Y952ItzfcuFgg7e9WurtF3qbgeA5rz9kgXItUDx8AbDqsyeJIFu0KxSIUL/1Zla5vwonq+Arn61/UXx0uiLXcHNrfcbZ5tR9AZjtOHUdEJS1wCIqy2LYen6glfOMNzjPSMu25XQqro4ACv0R6POFjqPaBRD48AWAzwFhXkMd7GqfPvCQnI8rklhZ+ZUzgDiKgONbrNT3O6d6t8UdT/q1Tg08iohPie4UXmQ117BmEQjAfOfEaabQwpp5UculEi2GnFgdAsDdUDpwdx3Vv1WqxlAsyivRF9/neibOBA0XCAAwfxBBuX8oQU4g0Uck5WIRYEjOBTnre44d4otV1iZ2f9y3T/FEMABsRJQ/zoXrw6C0tE6l97kaDSvF6Der5tjc8C+8qbaHt/jt/flU6khY71AAmEK/kCYnsAgUykHIIRHWRd/uFpcF6LP3z3eOzdtj+5WhAEhHAhgDz0ExcgL/6NuDR2dBnL3fnk1KIwDKkROERV+cEYnKgjh7v8xjixEA5cgJVu9vdN37fGtdE7GdWS2jsYABU25FXvwC9/7VeVa/jQAQU7+cQBIaOR8k917qbWRHhxQbhA8AcBQ8h9gKYzzNSpUfzuRndWXvz1sQuvrbgxkD4JcTWCsrr9uD+ZWN/2zj1R1d0Qeg60uN8OFSEx0W3d3XjAWI1svufjwSwcJ8V+a03R5WGgMAzCve/iLnBBJJ3crPC+vIX09k/hPhBZWZ4HY1lAUESLrnfiDj6MuM5gCwNcXICfQrfyH6JerHYUGSvZ8vpfSJBEDUnCAs+rYXcViQZO+355UyEgDSgSLkBCbRlzFForAg6d4v89kSGQDTnMA0+rYjUViQdO+355QyMgB+OQHmwbUfR4k+FA9TFvAC6ZpLuvNC+2XQc7/Y6CQyADKILifgHeJpOyeIGn0ZU8SEBb57P4KSroPBEQuAsJwgTvRtX8NYgGXY++25pIwFAEhOoNlviX8nkL+kmI7K8z4BDEuEZdIgERu2HfHaMO2H5N8p3d7Pv/qc8Nqb1uMBwKPnrZQyKd8GLU24/A2AO+sjomuLVPcxGB5s+5H0cZtj845c6luZw90OkLPomLfNtB4bAN//DgD3KpMjHL7ac2xRafdpWLXFUqJUMkPoLulFhRkxfaVr4tdiNXIRGwCZialqsPC4sz7pZyL6tUDtSQG/+avWaksiAHQ5gXcKBqmQ83vbw+qFtYBQeUZw9uPoZ4N+83fa+umJAPDLCdYmixd9u38YC3ixjbX32+NLmQgAGUCXE0i7SFD0Td4TDGNBPubeL77ZkhgAv5yAn8zleV9dyIoz87Os0XuCfixg+muf+4vDGxeJASjkBKj77wCC733nu4FO3eO6HwtQk4d4uhpVkwPA02TvWB5huv/NauHD+sVlzAYuYAVDwy9atoY54tO2Oet/ZutzZRm/LAAsdJy8mgPay469TUSv8v/9T17pOnXDdjhpOf/MWHauZ7wTID8IRIeWrRuPy5xJx5X+ZQFABrrcnbnETg7P9WQ+kfp6yGz3xPHZnswog1tiW9J5ygZAUkcq1b8GQKWQr5Z5awyoWCSc7wY69Q12qGIMkHcDOV+Y4R8zyvqeYFT8KgYA5wrr8p7gLQNAVEfXy75iDFivC4o6bg2AqIjdbva3PAOSBuR/AAAA//91lnu7AAAABklEQVQDAC7l4Z9+c+1QAAAAAElFTkSuQmCC"/>
+<div>
+<h1 class="text-2xl font-headline font-black text-on-surface leading-tight">WatchFlow</h1>
+<p class="text-xs text-on-surface-variant font-label uppercase tracking-widest">Ops Center</p>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-primary text-on-primary-container font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-transform active:scale-95 duration-100">
+<span class="material-symbols-outlined">add</span>
+                New Monitor
+            </button>
+</div>
+<nav class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Dashboard Active -->
+<div class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-lg px-4 py-3 mx-2 mb-1 cursor-pointer">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body text-label-lg">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant rounded-lg px-4 py-3 mx-2 mb-1 transition-all cursor-pointer">
+<span class="material-symbols-outlined">visibility</span>
+<span class="font-body text-label-lg">Monitors</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant rounded-lg px-4 py-3 mx-2 mb-1 transition-all cursor-pointer">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body text-label-lg">Runs</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant rounded-lg px-4 py-3 mx-2 mb-1 transition-all cursor-pointer">
+<span class="material-symbols-outlined">warning</span>
+<span class="font-body text-label-lg">Alerts</span>
+<span class="ml-auto bg-error text-on-error rounded-full text-[10px] px-1.5 py-0.5 font-bold">3</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant rounded-lg px-4 py-3 mx-2 mb-1 transition-all cursor-pointer">
+<span class="material-symbols-outlined">screenshot</span>
+<span class="font-body text-label-lg">Screenshots</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant rounded-lg px-4 py-3 mx-2 mb-1 transition-all cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body text-label-lg">Settings</span>
+</div>
+</nav>
+<div class="mt-auto border-t border-outline-variant p-4 space-y-1">
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+<span class="font-body text-label-md">Support</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface px-4 py-2 cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="font-body text-label-md">Logs</span>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 ml-64 flex flex-col h-full bg-surface">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center px-6 h-16 w-full bg-surface-container-low dark:bg-surface-container-low border-b border-outline-variant dark:border-outline-variant z-40">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 font-body text-label-md text-on-surface-variant">
+<span class="hover:text-primary transition-colors cursor-pointer">Workspace</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="hover:text-primary transition-colors cursor-pointer">Production</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-bold border-b-2 border-primary py-4 mt-1">v2.4.0</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<input class="bg-surface-variant border-none rounded-full px-10 py-1.5 text-sm text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary w-64" placeholder="Search resources..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="bg-primary/20 text-primary border border-primary/30 px-3 py-1 rounded-full text-xs font-bold tracking-wide">Demo Mode</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">help_outline</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline cursor-pointer active:opacity-80">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a technical systems administrator in a dimly lit office with ambient blue and green glow from server racks in the background. High-quality professional photography with shallow depth of field, focused on a modern tech-savvy appearance with a friendly yet professional expression." src="/stitch/assets/3d5eecf183d91586.jpg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Scrollable Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div class="bento-card p-5 rounded-xl border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-sm uppercase font-semibold">Active Monitors</span>
+<span class="material-symbols-outlined text-primary">sensors</span>
+</div>
+<div class="mt-4">
+<h2 class="text-3xl font-headline font-bold text-on-surface">12</h2>
+<p class="text-xs text-primary-dim mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">arrow_upward</span>
+                            +2 from last week
+                        </p>
+</div>
+</div>
+<div class="bento-card p-5 rounded-xl border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-sm uppercase font-semibold">Success Rate</span>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div class="mt-4">
+<h2 class="text-3xl font-headline font-bold text-on-surface">98.4%</h2>
+<div class="w-full bg-surface-container mt-2 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[98.4%]"></div>
+</div>
+</div>
+</div>
+<div class="bento-card p-5 rounded-xl border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-sm uppercase font-semibold">Changes Detected</span>
+<span class="material-symbols-outlined text-tertiary">difference</span>
+</div>
+<div class="mt-4">
+<h2 class="text-3xl font-headline font-bold text-on-surface">3</h2>
+<p class="text-xs text-tertiary-dim mt-1">Pending review</p>
+</div>
+</div>
+<div class="bento-card p-5 rounded-xl border border-outline-variant flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-label text-sm uppercase font-semibold">Failed Runs</span>
+<span class="material-symbols-outlined text-error">cancel</span>
+</div>
+<div class="mt-4">
+<h2 class="text-3xl font-headline font-bold text-on-surface">0</h2>
+<p class="text-xs text-primary-dim mt-1">System healthy</p>
+</div>
+</div>
+</div>
+<!-- Dashboard Body Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Monitor Overview & Alerts Left Column -->
+<div class="col-span-12 lg:col-span-3 space-y-6">
+<!-- Monitor Overview -->
+<section class="bento-card rounded-xl overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
+<h3 class="font-headline font-bold text-sm uppercase text-on-surface">Active Monitors</h3>
+<span class="material-symbols-outlined text-sm cursor-pointer">more_vert</span>
+</div>
+<div class="p-2 divide-y divide-outline-variant">
+<div class="p-3 hover:bg-surface-variant/50 transition-all rounded-lg cursor-pointer">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-semibold text-on-surface truncate">Competitor Pricing</span>
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-6 flex items-end gap-0.5">
+<div class="w-full bg-primary/40 h-[40%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[60%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[55%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[80%] rounded-t-sm"></div>
+<div class="w-full bg-primary h-[95%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] font-mono text-primary-dim">95ms</span>
+</div>
+</div>
+<div class="p-3 hover:bg-surface-variant/50 transition-all rounded-lg cursor-pointer">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-semibold text-on-surface truncate">Job Board Scraper</span>
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-6 flex items-end gap-0.5">
+<div class="w-full bg-primary/40 h-[70%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[65%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[75%] rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-[85%] rounded-t-sm"></div>
+<div class="w-full bg-primary h-[80%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] font-mono text-primary-dim">1.2s</span>
+</div>
+</div>
+<div class="p-3 hover:bg-surface-variant/50 transition-all rounded-lg cursor-pointer">
+<div class="flex justify-between items-center mb-1">
+<span class="text-sm font-semibold text-on-surface truncate">Vendor API Status</span>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-6 flex items-end gap-0.5">
+<div class="w-full bg-tertiary/40 h-[20%] rounded-t-sm"></div>
+<div class="w-full bg-tertiary/40 h-[90%] rounded-t-sm"></div>
+<div class="w-full bg-tertiary/40 h-[40%] rounded-t-sm"></div>
+<div class="w-full bg-tertiary/40 h-[30%] rounded-t-sm"></div>
+<div class="w-full bg-tertiary h-[85%] rounded-t-sm"></div>
+</div>
+<span class="text-[10px] font-mono text-tertiary-dim">4.5s</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Alert Queue -->
+<section class="bento-card rounded-xl overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-high">
+<h3 class="font-headline font-bold text-sm uppercase text-on-surface">Alert Queue</h3>
+</div>
+<div class="p-4 space-y-3">
+<div class="flex gap-3 p-3 bg-error-container/20 border-l-4 border-error rounded-r-lg">
+<span class="material-symbols-outlined text-error text-lg">warning</span>
+<div>
+<p class="text-xs font-bold text-on-error-container">High: Change Detected</p>
+<p class="text-[10px] text-on-surface-variant">Competitor A price drop &gt; 15%</p>
+</div>
+</div>
+<div class="flex gap-3 p-3 bg-secondary-container/20 border-l-4 border-secondary rounded-r-lg">
+<span class="material-symbols-outlined text-secondary text-lg">bolt</span>
+<div>
+<p class="text-xs font-bold text-on-secondary-container">Med: Latency Spike</p>
+<p class="text-[10px] text-on-surface-variant">Vendor API p99 &gt; 5000ms</p>
+</div>
+</div>
+<div class="flex gap-3 p-3 bg-surface-container-highest border-l-4 border-outline rounded-r-lg">
+<span class="material-symbols-outlined text-outline text-lg">info</span>
+<div>
+<p class="text-xs font-bold text-on-surface">Low: New Version Detected</p>
+<p class="text-[10px] text-on-surface-variant">Production tag updated to v2.4.1</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Main Workspace Middle Column -->
+<div class="col-span-12 lg:col-span-9 space-y-6">
+<!-- Run Details Panel -->
+<section class="bento-card rounded-xl overflow-hidden flex flex-col h-[600px]">
+<div class="p-4 border-b border-outline-variant bg-surface-container-high flex flex-wrap justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">data_exploration</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-on-surface">Competitor Pricing - Amazon</h3>
+<p class="text-xs font-mono text-outline truncate max-w-xs lg:max-w-md">https://amazon.com/s?k=macbook+pro+m3</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<div class="flex items-center justify-end gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-xs font-bold text-primary">Successful</span>
+</div>
+<p class="text-[10px] text-on-surface-variant">Duration: 4.2s</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="bg-surface-variant hover:bg-outline-variant p-2 rounded-md transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+</button>
+<button class="bg-primary text-on-primary-container px-4 py-1.5 rounded-md text-xs font-bold transition-transform active:scale-95">
+                                        Rerun Now
+                                    </button>
+</div>
+</div>
+</div>
+<div class="flex-1 flex overflow-hidden">
+<!-- Body Left: Terminal Logs -->
+<div class="w-1/2 terminal-bg p-4 overflow-y-auto custom-scrollbar border-r border-outline-variant">
+<div class="flex items-center gap-2 mb-4">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-amber-500/50"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+</div>
+<span class="text-[10px] text-outline font-mono ml-4">PLAYWRIGHT_LOG_V2</span>
+</div>
+<div class="space-y-1 text-[12px] font-mono">
+<div class="flex gap-3">
+<span class="text-outline">12:04:01.002</span>
+<span class="text-secondary">[runner]</span>
+<span class="text-on-surface">launching chromium browser engine...</span>
+</div>
+<div class="flex gap-3">
+<span class="text-outline">12:04:02.145</span>
+<span class="text-secondary">[runner]</span>
+<span class="text-on-surface">navigating to <span class="text-primary-dim">https://amazon.com/...</span></span>
+</div>
+<div class="flex gap-3">
+<span class="text-outline">12:04:03.450</span>
+<span class="text-secondary">[action]</span>
+<span class="text-on-surface">waiting for selector <span class="text-tertiary">.s-result-item</span></span>
+</div>
+<div class="flex gap-3">
+<span class="text-outline">12:04:03.900</span>
+<span class="text-secondary">[action]</span>
+<span class="text-on-surface">extracting text from <span class="text-tertiary">.a-price-whole</span></span>
+</div>
+<div class="flex gap-3">
+<span class="text-outline">12:04:04.102</span>
+<span class="text-primary">[success]</span>
+<span class="text-primary-dim">payload generated successfully (3 nodes)</span>
+</div>
+<div class="flex gap-3 animate-pulse">
+<span class="text-outline">12:04:04.105</span>
+<span class="text-secondary">[system]</span>
+<span class="text-on-surface">closing browser context_</span>
+</div>
+</div>
+</div>
+<!-- Body Right: Data & Screenshot -->
+<div class="w-1/2 flex flex-col overflow-hidden">
+<div class="flex-1 p-4 overflow-y-auto custom-scrollbar bg-surface-container-low">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Extracted Data</span>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-on-surface-variant">Show Diff</span>
+<div class="w-8 h-4 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="font-mono text-xs space-y-2">
+<div class="p-2 border border-outline-variant rounded bg-black/30">
+<span class="text-secondary-dim">"product_name":</span> <span class="text-on-surface">"MacBook Pro M3 Max 14-inch"</span>,
+                                        </div>
+<div class="p-2 border border-outline-variant rounded bg-black/30 diff-changed">
+<span class="text-secondary-dim">"price":</span> <span class="text-on-surface">"3199.99"</span>, <span class="ml-2 text-[10px] italic">(Was 3499.00)</span>
+</div>
+<div class="p-2 border border-outline-variant rounded bg-black/30">
+<span class="text-secondary-dim">"stock_status":</span> <span class="text-primary-dim">"In Stock"</span>,
+                                        </div>
+<div class="p-2 border border-outline-variant rounded bg-black/30">
+<span class="text-secondary-dim">"merchant":</span> <span class="text-on-surface">"Amazon US"</span>
+</div>
+</div>
+</div>
+<div class="h-48 border-t border-outline-variant relative group overflow-hidden">
+<div class="absolute inset-0 bg-black/40 z-10 group-hover:bg-black/10 transition-colors pointer-events-none flex items-center justify-center">
+<div class="bg-surface-dim/80 px-3 py-1.5 rounded-lg border border-outline-variant flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-sm">fullscreen</span>
+<span class="text-[10px] font-bold">VIEW FULLSCREEN</span>
+</div>
+</div>
+<img class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all scale-100 group-hover:scale-105" data-alt="High-resolution technical UI screenshot of a dark-themed e-commerce product page showing a laptop. The interface is clean and modern, with crisp fonts and sharp layout. In the corner, a green 'Captured' overlay is visible. Dark mode aesthetics with deep blue and slate colors, professional and high-fidelity." src="/stitch/assets/98c0ef7c4e3067d2.jpg"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Run Table -->
+<section class="bento-card rounded-xl overflow-hidden">
+<div class="p-4 border-b border-outline-variant bg-surface-container-high flex justify-between items-center">
+<h3 class="font-headline font-bold text-sm uppercase text-on-surface">Recent Run History</h3>
+<button class="text-xs text-primary hover:underline transition-all">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">
+<tr>
+<th class="px-6 py-3">Timestamp</th>
+<th class="px-6 py-3">Monitor Name</th>
+<th class="px-6 py-3">Result</th>
+<th class="px-6 py-3">Duration</th>
+<th class="px-6 py-3">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant text-sm">
+<tr class="hover:bg-surface-variant/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-xs text-on-surface-variant">2023-11-24 12:04:01</td>
+<td class="px-6 py-4 font-semibold text-on-surface">Competitor Pricing - Amazon</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">SUCCESS</span>
+</td>
+<td class="px-6 py-4 font-mono text-xs">4.2s</td>
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-lg">chevron_right</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-xs text-on-surface-variant">2023-11-24 11:45:12</td>
+<td class="px-6 py-4 font-semibold text-on-surface">Job Board Scraper</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">SUCCESS</span>
+</td>
+<td class="px-6 py-4 font-mono text-xs">1.2s</td>
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-lg">chevron_right</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-xs text-on-surface-variant">2023-11-24 11:30:55</td>
+<td class="px-6 py-4 font-semibold text-on-surface">Vendor API Status</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-tertiary/20 text-tertiary text-[10px] font-bold">CHANGED</span>
+</td>
+<td class="px-6 py-4 font-mono text-xs">4.5s</td>
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-lg">chevron_right</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-xs text-on-surface-variant">2023-11-24 11:15:00</td>
+<td class="px-6 py-4 font-semibold text-on-surface">Competitor Pricing - BestBuy</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">SUCCESS</span>
+</td>
+<td class="px-6 py-4 font-mono text-xs">3.8s</td>
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-lg">chevron_right</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/40 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-mono text-xs text-on-surface-variant">2023-11-24 11:00:22</td>
+<td class="px-6 py-4 font-semibold text-on-surface">Competitor Pricing - Amazon</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">SUCCESS</span>
+</td>
+<td class="px-6 py-4 font-mono text-xs">4.1s</td>
+<td class="px-6 py-4">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-lg">chevron_right</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for dashboard realism
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Toggle logic simulation for diff view
+        const toggle = document.querySelector('.bg-primary.rounded-full');
+        if(toggle) {
+            toggle.addEventListener('click', () => {
+                const inner = toggle.querySelector('div');
+                const isOff = inner.classList.contains('right-0.5');
+                if(isOff) {
+                    inner.classList.remove('right-0.5');
+                    inner.classList.add('left-0.5');
+                    toggle.classList.replace('bg-primary', 'bg-outline-variant');
+                } else {
+                    inner.classList.remove('left-0.5');
+                    inner.classList.add('right-0.5');
+                    toggle.classList.replace('bg-outline-variant', 'bg-primary');
+                }
+            });
+        }
+    </script>
+</body></html>
