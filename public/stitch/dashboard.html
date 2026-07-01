@@ -578,36 +578,94 @@
         }
     </script>
 
-
-
 <style id="stitch-demo-interactions-style">
   .demo-toast-host { position: fixed; right: 24px; bottom: 24px; z-index: 99999; display: grid; gap: 10px; pointer-events: none; }
   .demo-toast { pointer-events: auto; max-width: 360px; border: 1px solid rgba(56,189,248,.35); background: rgba(2,6,23,.92); color: #e2e8f0; border-radius: 14px; padding: 12px 14px; box-shadow: 0 18px 50px rgba(0,0,0,.34); font: 600 12px Inter, system-ui, sans-serif; backdrop-filter: blur(14px); }
   .demo-toast b { display:block; color: #67e8f9; margin-bottom: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
   .demo-modal-backdrop { position: fixed; inset: 0; z-index: 99998; display: none; place-items: center; background: rgba(2,6,23,.58); backdrop-filter: blur(8px); }
   .demo-modal-backdrop.open { display: grid; }
-  .demo-modal { width: min(540px, calc(100vw - 32px)); border: 1px solid rgba(56,189,248,.32); background: #0f172a; color: #e2e8f0; border-radius: 18px; padding: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.45); font-family: Inter, system-ui, sans-serif; }
-  .demo-modal h3 { margin: 0 0 8px; font: 700 20px Inter, sans-serif; color: #f8fafc; }.demo-modal p{margin:0 0 16px;color:#94a3b8;line-height:1.55;font-size:13px}.demo-modal input,.demo-modal select,.demo-modal textarea{width:100%;margin:7px 0;border:1px solid #334155;border-radius:10px;background:#020617;color:#e2e8f0;padding:10px 12px;font:13px Inter,sans-serif}.demo-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}.demo-modal-actions button{border:1px solid #334155;border-radius:10px;padding:9px 13px;background:#111827;color:#cbd5e1}.demo-modal-actions button.primary{border-color:rgba(34,211,238,.45);background:rgba(6,182,212,.18);color:#67e8f9}.demo-interactive-pulse{outline:2px solid rgba(56,189,248,.45)!important;box-shadow:0 0 0 6px rgba(56,189,248,.08)!important;transition:box-shadow .2s ease, outline .2s ease}.demo-topnav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.demo-topnav a{border:1px solid rgba(148,163,184,.18);border-radius:999px;padding:8px 12px;color:#94a3b8;text-decoration:none;font-size:12px;font-weight:800}.demo-topnav a.active,.demo-topnav a:hover{color:#67e8f9;border-color:rgba(34,211,238,.35);background:rgba(8,145,178,.12)}
+  .demo-modal { width: min(520px, calc(100vw - 32px)); border: 1px solid rgba(56,189,248,.32); background: #0f172a; color: #e2e8f0; border-radius: 18px; padding: 22px; box-shadow: 0 30px 80px rgba(0,0,0,.45); font-family: Inter, system-ui, sans-serif; }
+  .demo-modal h3 { margin: 0 0 8px; font: 700 20px 'Space Grotesk', Inter, sans-serif; color: #f8fafc; }
+  .demo-modal p { margin: 0 0 16px; color: #94a3b8; line-height: 1.55; font-size: 13px; }
+  .demo-modal input, .demo-modal select, .demo-modal textarea { width: 100%; margin: 7px 0; border: 1px solid #334155; border-radius: 10px; background: #020617; color: #e2e8f0; padding: 10px 12px; font: 13px Inter, system-ui, sans-serif; }
+  .demo-modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:14px; }
+  .demo-modal-actions button { border:1px solid #334155; border-radius:10px; padding:9px 13px; background:#111827; color:#cbd5e1; }
+  .demo-modal-actions button.primary { border-color: rgba(34,211,238,.45); background: rgba(6,182,212,.18); color:#67e8f9; }
+  .demo-interactive-pulse { outline: 2px solid rgba(56,189,248,.45) !important; box-shadow: 0 0 0 6px rgba(56,189,248,.08) !important; transition: box-shadow .2s ease, outline .2s ease; }
 </style>
+
 
 <script id="stitch-demo-interactions-script">
 (() => {
-  const route = (path) => { if (window.top && window.top !== window) window.top.location.href = path; else window.location.href = path; };
-  const host=document.createElement('div'); host.className='demo-toast-host'; document.body.appendChild(host);
-  function toast(title,msg){const el=document.createElement('div');el.className='demo-toast';el.innerHTML=`<b>${title}</b><span>${msg}</span>`;host.appendChild(el);setTimeout(()=>el.remove(),3600)}
-  const modal=document.createElement('div');modal.className='demo-modal-backdrop';modal.innerHTML=`<div class="demo-modal"><h3></h3><p></p><div class="demo-fields"></div><div class="demo-modal-actions"><button data-demo-close>Cancel</button><button class="primary" data-demo-confirm>Save</button></div></div>`;document.body.appendChild(modal);
-  function openModal(t,p,f=''){modal.querySelector('h3').textContent=t;modal.querySelector('p').textContent=p;modal.querySelector('.demo-fields').innerHTML=f;modal.classList.add('open')}
-  modal.addEventListener('click',e=>{if(e.target===modal||e.target.matches('[data-demo-close]'))modal.classList.remove('open');if(e.target.matches('[data-demo-confirm]')){modal.classList.remove('open');toast('Saved in demo','Monitor state updated locally.')}})
-  function txt(el){return (el.textContent||'').replace(/\s+/g,' ').trim().toLowerCase()} function mark(el){el.classList.add('demo-interactive-pulse');setTimeout(()=>el.classList.remove('demo-interactive-pulse'),900)}
-  async function rerun(type='pricing'){try{const res=await fetch('/api/runs/demo',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({type})});const data=await res.json();toast('Monitor rerun complete',`${data.run?.id||'WF'} → ${data.run?.result||'success'}`)}catch{toast('Run queued','Local demo action completed.')}}
-  function download(){const blob=new Blob([JSON.stringify({monitor:'WatchFlow demo',status:'exported',time:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='watchflow-demo-run.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('JSON exported','Demo evidence downloaded.');}
-  document.addEventListener('click',async e=>{const el=e.target.closest('button,a,[role="button"],.demo-card'); if(!el)return; const t=txt(el); mark(el); if(el.getAttribute('href')==='#')e.preventDefault();
-    if(t.includes('dashboard')) return route('/'); if(t.includes('monitors')) return route('/monitors'); if(t.includes('run history')||t.includes('view all')) return route('/runs'); if(t.includes('exports')) return route('/exports'); if(t.includes('settings')) return route('/settings');
-    if(t.includes('new monitor')) return route('/monitors/new'); if(t.includes('download')) return download(); if(t.includes('rerun now')||t.includes('rerun')) return await rerun(t.includes('job')?'jobs':'pricing'); if(t.includes('competitor pricing')) return route('/monitor/competitor-pricing'); if(t.includes('job board')) return route('/monitor/job-board'); if(t.includes('vendor api')) return route('/monitor/vendor-api');
-    if(t.includes('save monitor')) return openModal('Monitor saved','This demo keeps the configuration local and safe.','<input value="Competitor pricing watch"/>');
-  },true);
-  document.querySelectorAll('.rounded-xl,.rounded-lg,.demo-card').forEach(card=>{const t=txt(card); if(t.includes('competitor pricing')||t.includes('job board')||t.includes('vendor api')){card.style.cursor='pointer';card.addEventListener('click',e=>{if(e.target.closest('button,a'))return; if(t.includes('competitor pricing'))route('/monitor/competitor-pricing'); else if(t.includes('job board'))route('/monitor/job-board'); else route('/monitor/vendor-api');})}});
-  toast('Interactive demo ready','All WatchFlow navigation options and actions are wired.');
+  const host = document.createElement('div');
+  host.className = 'demo-toast-host';
+  document.body.appendChild(host);
+  function toast(title, message) {
+    const el = document.createElement('div');
+    el.className = 'demo-toast';
+    el.innerHTML = `<b>${title}</b><span>${message}</span>`;
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 3600);
+  }
+  const modal = document.createElement('div');
+  modal.className = 'demo-modal-backdrop';
+  modal.innerHTML = `<div class="demo-modal" role="dialog" aria-modal="true"><h3></h3><p></p><div class="demo-fields"></div><div class="demo-modal-actions"><button data-demo-close>Cancel</button><button class="primary" data-demo-confirm>Save</button></div></div>`;
+  document.body.appendChild(modal);
+  function openModal(title, text, fields = '') {
+    modal.querySelector('h3').textContent = title;
+    modal.querySelector('p').textContent = text;
+    modal.querySelector('.demo-fields').innerHTML = fields;
+    modal.classList.add('open');
+  }
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal || event.target.matches('[data-demo-close]')) modal.classList.remove('open');
+    if (event.target.matches('[data-demo-confirm]')) { modal.classList.remove('open'); toast('Saved in demo', 'The monitor configuration was updated locally for this demo session.'); }
+  });
+  function textOf(el) { return (el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  function mark(el) { el.classList.add('demo-interactive-pulse'); setTimeout(() => el.classList.remove('demo-interactive-pulse'), 900); }
+  async function rerun() {
+    try {
+      const res = await fetch('/api/runs/demo', { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({ type:'pricing' }) });
+      const data = await res.json();
+      toast('Monitor rerun complete', `${data.run?.id || 'WF'} → ${data.run?.result || 'success'} in ${data.run?.duration || 'demo time'}`);
+      const success = Array.from(document.querySelectorAll('*')).find(n => (n.textContent||'').trim() === '98.4%');
+      if (success) success.textContent = '98.7%';
+    } catch { toast('Run queued', 'The local demo action completed; API response unavailable.'); }
+  }
+  function downloadDemo() {
+    const payload = { monitor: 'Competitor Pricing - Amazon', status: 'Successful', duration: '4.2s', extracted: { name: 'Workflow Automation Starter', price: '$149', stock: 'In stock' } };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'watchflow-demo-run.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('JSON exported', 'Demo run evidence downloaded as watchflow-demo-run.json.');
+  }
+  document.addEventListener('click', (event) => {
+    const el = event.target.closest('button,a,[role="button"]');
+    if (!el) return;
+    mark(el);
+    const t = textOf(el);
+    if (t.includes('new monitor')) { openModal('New browser monitor', 'Configure a demo-safe target without scraping real websites.', '<input value="Competitor pricing watch"/><input value="https://example-shop.test/search?q=automation"/><select><option>Every 30 minutes</option><option>Every 4 hours</option></select>'); return; }
+    if (t.includes('download')) { downloadDemo(); return; }
+    if (t.includes('rerun now')) { rerun(); return; }
+    if (t.includes('view all')) { toast('Run history expanded', 'The table is showing the latest demo runs. In production this would open the full runs page.'); document.querySelector('table')?.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  }, true);
+  // Make major cards feel alive even if Stitch exported them as divs, not buttons.
+  document.querySelectorAll('.rounded-xl, .rounded-lg').forEach((card) => {
+    const text = textOf(card);
+    if (text.includes('competitor pricing') || text.includes('job board') || text.includes('vendor api')) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', (event) => {
+        if (event.target.closest('button,a')) return;
+        mark(card);
+        toast('Monitor selected', (card.textContent || 'Monitor').replace(/\s+/g, ' ').trim().slice(0, 90));
+      });
+    }
+  });
+  toast('Interactive demo ready', 'Buttons, monitor cards and export actions are now clickable in this Stitch export.');
 })();
 </script>
+
 </body></html>
